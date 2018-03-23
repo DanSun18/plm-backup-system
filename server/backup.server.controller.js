@@ -31,27 +31,55 @@ return false;
     return false;
 };
 
-exports.constructFileName = function(){
+/*
+type: string, can be "daily", "weekly", "monthly"
+*/
+exports.constructFileName = function(type, currentDate){
 	console.log("Construcint file name for backed up file");
-	var date = new Date();
-	var beforeDate, oldBackupDir, oldBackupPath;
-	currentDate = this.stringToDate(date); //current date
+	
 	const currentYear = currentDate.getFullYear();
 	const currentMonth = currentDate.getMonth() + 1;
 	const currentDay = currentDate.getDate();
-	var newBackupDir = currentYear + '-' + currentMonth + '-' + currentDay;
+	var newBackupDir = type + '/' + currentYear + '-' + currentMonth + '-' + currentDay;
 	var newBackupPath = dbOptionsLocal.autoBackupPath + 'mongodump-' + newBackupDir; // New backup path for current backup process
 	console.log("Path of back up file is " + newBackupPath);
 	return newBackupPath;
 }
 
-//back up once, for testing purposes
-exports.backup = function(){
-	console.log("Entered controller of backup");
-	if (dbOptionsLocal.autoBackup == true){
-		console.log("started back up protocol");
-		//not checking for removing old backup yet
-		const newBackupPath = this.constructFileName();
+exports.getOldBackupFilePath = function(type, currentDate){
+	if (dbOptionsLocal.removeOldBackup == true) {
+		var beforeDate, oldBackupDir, oldBackupPath;
+        beforeDate = _.clone(currentDate);
+        console.log("performing " + type + " backup");
+        console.log("current date is")
+        console.log(beforeDate);
+        if(type == "daily"){
+        	beforeDate = new Date(beforeDate.getFullYear(), beforeDate.getMonth(), beforeDate.getDate() - dbOptionsLocal.retainDailyBackupFor);
+        	// beforeDate.setDate(beforeDate.getDate() - dbOptionsLocal.retainDailyBackupFor); // Substract number of days to keep backup and remove old backup
+        } else if (type == "weekly"){
+        	const daysInWeek = 7;
+        	beforeDate = new Date(beforeDate.getFullYear(), beforeDate.getMonth(), beforeDate.getDate() - dbOptionsLocal.retainWeeklyUpdateFor * daysInWeek);
+        	// beforeDate.setDate(beforeDate.getDate() - dbOptionsLocal.retainWeeklyUpdateFor * daysInWeek);
+        } else if (type == "monthly"){
+        	beforeDate = new Date(beforeDate.getFullYear(), beforeDate.getMonth() - dbOptionsLocal.retainMontlyUpdateFor, 1);
+        }
+        console.log("Backup to be deleted should be performed on day")
+        console.log(beforeDate);
+        oldBackupDir = type + '/' + beforeDate.getFullYear() + '-' + (beforeDate.getMonth() + 1) + '-' + beforeDate.getDate();
+        oldBackupPath = dbOptionsLocal.autoBackupPath + 'mongodump-' + oldBackupDir; // old backup(after keeping # of days)
+    	console.log("old backup file should be stored at " + oldBackupPath);
+    	return oldBackupPath;
+    }
+}
+
+/*
+type: string, can be "daily", "weekly", "monthly"
+*/
+exports.performBackupRoutine = function(type, currentDate){
+if (dbOptionsLocal.autoBackup == true){
+		console.log("started back up routine");
+		const oldBackupPath = this.getOldBackupFilePath(type, currentDate);
+		const newBackupPath = this.constructFileName(type, currentDate);
 		var cmd = '~/Applications/mongodb/bin/mongodump --host ' + dbOptionsLocal.host + ' --port ' + dbOptionsLocal.port + ' --db ' + dbOptionsLocal.database + ' --username ' + dbOptionsLocal.user + ' --password ' + dbOptionsLocal.pass + ' --out ' + newBackupPath; // Command for mongodb dump process
 		const me = this;
 		console.log("Ready to execute command:")
@@ -59,6 +87,12 @@ exports.backup = function(){
 		exec(cmd, function(error, stdout, stderr) {
 			if (me.empty(error)) {
 				console.log("Database backup dumped to " + newBackupPath);
+				if (dbOptionsLocal.removeOldBackup == true) {
+                    if (fs.existsSync(oldBackupPath)) {
+                    	console.log("Removing old backup at " + oldBackupPath)
+                        exec("rm -rf " + oldBackupPath, function (err) { });
+                    }
+                }
 			} else {
 				console.log("error encountered during backup");
 				console.log(error);
@@ -66,7 +100,46 @@ exports.backup = function(){
 		});
 	}
 }
-// Auto backup script
+
+
+
+exports.performDailyBackup = function(currentDate){
+	console.log('Performing Daily Backup');
+	const backupType = "daily";
+	this.performBackupRoutine(backupType, currentDate);
+	
+}
+
+exports.performWeeklyBackup = function(currentDate){
+	console.log('Performing Weekly Backup');
+	const backupType = "weekly";
+	this.performBackupRoutine(backupType, currentDate);
+}
+
+exports.performMonthlyBackup = function(currentDate){
+	console.log('Performing Monthly Backup');
+	const backupType = "monthly";
+	this.performBackupRoutine(backupType, currentDate);
+}
+//entry point for testing purposes
+exports.backup = function(){
+	console.log("Entered  backup controller entry point");
+	var date = new Date();
+	currentDate = this.stringToDate(date); //current date
+
+	this.performDailyBackup(currentDate);
+	if(currentDate.getDay() == 1){ //Monday
+		this.performWeeklyBackup(currentDate);
+	}
+	if(currentDate.getDate() == 1){ //monthly back up on the first of every month
+		this.performMonthlyBackup(currentDate);
+	}
+	console.log("Exited  backup controller entry function");
+	
+}
+
+
+// Auto backup script as adopted from tutorial
 exports.dbAutoBackUp = function () {
 // check for auto backup is enabled or disabled
     if (dbOptionsLocal.autoBackup == true) {
