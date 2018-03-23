@@ -77,7 +77,7 @@ type: string, can be "daily", "weekly", "monthly"
 */
 exports.performBackupRoutine = function(type, currentDate){
 if (dbOptionsLocal.autoBackup == true){
-		console.log("started back up routine");
+		console.log("Started " + type + " backup routine");
 		const oldBackupPath = this.getOldBackupFilePath(type, currentDate);
 		const newBackupPath = this.constructFileName(type, currentDate);
 		var cmd = '~/Applications/mongodb/bin/mongodump --host ' + dbOptionsLocal.host + ' --port ' + dbOptionsLocal.port + ' --db ' + dbOptionsLocal.database + ' --username ' + dbOptionsLocal.user + ' --password ' + dbOptionsLocal.pass + ' --out ' + newBackupPath; // Command for mongodb dump process
@@ -87,10 +87,19 @@ if (dbOptionsLocal.autoBackup == true){
 		exec(cmd, function(error, stdout, stderr) {
 			if (me.empty(error)) {
 				console.log("Database backup dumped to " + newBackupPath);
-				if (dbOptionsLocal.removeOldBackup == true) {
+				if (dbOptionsLocal.removeOldBackup == true) { //remove old backup 
                     if (fs.existsSync(oldBackupPath)) {
                     	console.log("Removing old backup at " + oldBackupPath)
-                        exec("rm -rf " + oldBackupPath, function (err) { });
+                        exec("rm -rf " + oldBackupPath, function (err) {
+                                if (me.empty(error)) {
+                                    console.log("Old data dump at " + oldBackupPath + " is deleted");
+                                } else {
+                                    console.log("Error encountered during deletion of old data at " + oldBackupPath);
+                                    console.log(error);
+                                }
+                                
+                            }
+                        );
                     }
                 }
 			} else {
