@@ -132,7 +132,10 @@ Perform some database operations to verify that you can do it.
 ## Configuring and Setting Up the Backup System
 
 ### Setting up your server for the backup system
+
 Our system is Ubuntu 16.04 LTS and you will need git, npm and Node.JS on the back up system. Please look at our deployment guide on how to set up your server and install the necessary tools. 
+
+In addition, install `mongodump` by running `sudo apt install mongodb-clients`
 
 ### Deploying the backup system from GitHub
 
