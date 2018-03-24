@@ -16,4 +16,12 @@ module.exports = function(app) {
 		}
 	);
 
+	app.route('/test/email').get( (req, res, next) => 
+		{
+			console.log("Entered router of email");
+			backup.sendEmailTesting();
+			res.send();
+		}
+	);
+
 };

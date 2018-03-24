@@ -4,8 +4,11 @@
 var fs = require('fs');
 var _ = require('lodash');
 var exec = require('child_process').exec;
-
+//for emailing
+var nodemailer = require('nodemailer');
+//config files
 var dbOptionsLocal = require('./dbOptions.config.js');
+var emailConfig = require('./email.config.js');
 
 
 /* return date object */
@@ -147,6 +150,27 @@ exports.backup = function(){
 	
 }
 
+exports.sendEmailTesting = function() {
+    this.sendEmail('Test Email', 'Successful');
+}
+
+exports.sendEmail = function(subject, text) {
+    var transporter = nodemailer.createTransport(emailConfig);
+    var mailOptions = {
+        from: 'realproducers458@gmail.com',
+        to: 'realproducers458@gmail.com',
+        subject: subject,
+        text: text
+    };
+
+    transporter.sendMail(mailOptions, fcuntion(error, info) {
+        if(error) {
+            console.log(error);
+        } else {
+            console.log('Email sent: ' + info.response);
+        }
+    })
+}
 
 // Auto backup script as adopted from tutorial
 exports.dbAutoBackUp = function () {
