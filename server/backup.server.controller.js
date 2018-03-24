@@ -34,6 +34,10 @@ return false;
     return false;
 };
 
+exports.capitalizeFirstLetter = function(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 /*
 type: string, can be "daily", "weekly", "monthly"
 */
@@ -87,27 +91,44 @@ if (dbOptionsLocal.autoBackup == true){
 		const me = this;
 		console.log("Ready to execute command:")
 		console.log(cmd);
+        //prepare email subject and text
+        var emailSubject = this.capitalizeFirstLetter(type) + " Backup Notification";
+        var emailText = "";
 		exec(cmd, function(error, stdout, stderr) {
 			if (me.empty(error)) {
 				console.log("Database backup dumped to " + newBackupPath);
+                const successfulBackupLine = "Your backup was stored successfully at " + newBackupPath + " on the backup server.\n\n";
+                emailText = emailText + successfulBackupLine;
 				if (dbOptionsLocal.removeOldBackup == true) { //remove old backup 
                     if (fs.existsSync(oldBackupPath)) {
                     	console.log("Removing old backup at " + oldBackupPath)
                         exec("rm -rf " + oldBackupPath, function (err) {
                                 if (me.empty(error)) {
                                     console.log("Old data dump at " + oldBackupPath + " is deleted");
+                                    const successfulDeletionLine = "Your backup stored at " + oldBackupPath + " was deleted due to retention policy.\n\n";
+                                    emailText = emailText + successfulDeletionLine;
                                 } else {
                                     console.log("Error encountered during deletion of old data at " + oldBackupPath);
                                     console.log(error);
+                                    const failDeletionLine = "Error: Failed to delete backup stored at " + oldBackupPath + " even though it exists.\n\n";
+                                    emailText = emailText + failDeletionLine;
+                                    //also add error to subject line
+                                    emailSubject = "ERROR: " + emailSubject;
                                 }
+                                me.sendEmail(emailSubject, emailText);
                                 
                             }
                         );
+                    } else {
+                        me.sendEmail(emailSubject, emailText);
                     }
                 }
 			} else {
 				console.log("error encountered during backup");
 				console.log(error);
+                emailText = "An error occured during back up!\n\n" + error;
+                emailSubject = "ERROR: " + emailSubject;
+                me.sendEmail(emailSubject, emailText); 
 			}
 		});
 	}
@@ -163,13 +184,14 @@ exports.sendEmail = function(subject, text) {
         text: text
     };
 
-    transporter.sendMail(mailOptions, fcuntion(error, info) {
+    transporter.sendMail(mailOptions, function(error, info) {
         if(error) {
             console.log(error);
+            console.log("Error: see info above");
         } else {
             console.log('Email sent: ' + info.response);
         }
-    })
+    });
 }
 
 // Auto backup script as adopted from tutorial
