@@ -1,12 +1,10 @@
 # Backup System Guide
 
-## Setup
-
-### Make the database password protected
+## Protect Your Database with Password
 
 We outline the steps to make the database password protected here. If your database is already password protected, you may skip this section. 
 
-#### On the server
+### On the server
 (adopted from https://ianlondon.github.io/blog/mongodb-auth/)
 We assume that mongo is running as a service on your service without password protection. For how to start mongo as a service, see our development guide. If your database is already username-password protected, you may want to skip this part.
 
@@ -50,11 +48,7 @@ bind_ip = 0.0.0.0
 
 Note: you can log in as the newly created `plmUser` by typing `mongo -u "plmUser" -p <plmPassword> --authenticationDatabase "plm"` on the server.
 
-##### Troubleshooting 
-
-If you cannot start mongo service after changing the 
-
-#### Locally 
+### Locally 
 
 (adotped from https://docs.mongodb.com/manual/tutorial/enable-authentication/)
 
@@ -135,4 +129,31 @@ sudo ./bin/mongo -u "plmUser" -p <plmPassword> --authenticationDatabase "plm"
 
 Perform some database operations to verify that you can do it.
 
+## Configuring and Setting Up the Backup System
+
+### Setting up your server for the backup system
+Our system is Ubuntu 16.04 LTS and you will need git, npm and Node.JS on the back up system. Please look at our deployment guide on how to set up your server and install the necessary tools. 
+
+### Deploying the backup system from GitHub
+
+1. Clone the repository from GitHub by running
+  
+```
+  git clone https://github.com/DanSun18/plm-backup-system.git
+  cd plm-backup-system
+```
+
+2. Change necessary configurations. Provide your actual password for the email account and database user in `server/dbOptions.config.js` and `server/email.config.js`. In addition, if you wish to use a different email, make changes to `server/email.config.js` as well as the `sendEmail` function in `server/backup.server.controller.js`.
+
+3. Run `npm install` to install all dependencies. 
+
+4. Use `npm run start-dev` to verify that nothing goes wrong.
+
+5. Use `nohup npm run start-dev >/dev/null 2>&1 & ` to run the server even after you log out the ssh session or close the terminal. The backup routine will run at 10pm New York Time everyday.
+
+6. Alternatively, you could use the scripts `startNonStoppingServer.sh` and `shutdownServer.sh` provided in the repository to start or shutdown the server, respectively.
+
+## Restoring from a backup
+
+## Verify Backup Validity
 
