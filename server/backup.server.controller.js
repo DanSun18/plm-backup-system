@@ -87,7 +87,7 @@ if (dbOptionsLocal.autoBackup == true){
 		console.log("Started " + type + " backup routine");
 		const oldBackupPath = this.getOldBackupFilePath(type, currentDate);
 		const newBackupPath = this.constructFileName(type, currentDate);
-		var cmd = '~/Applications/mongodb/bin/mongodump --host ' + dbOptionsLocal.host + ' --port ' + dbOptionsLocal.port + ' --db ' + dbOptionsLocal.database + ' --username ' + dbOptionsLocal.user + ' --password ' + dbOptionsLocal.pass + ' --out ' + newBackupPath; // Command for mongodb dump process
+		var cmd = 'mongodump --host ' + dbOptionsLocal.host + ' --port ' + dbOptionsLocal.port + ' --db ' + dbOptionsLocal.database + ' --username ' + dbOptionsLocal.user + ' --password ' + dbOptionsLocal.pass + ' --out ' + newBackupPath; // Command for mongodb dump process
 		const me = this;
 		console.log("Ready to execute command:")
 		console.log(cmd);
