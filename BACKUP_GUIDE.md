@@ -97,7 +97,7 @@ Edit your MongoDB config file for the mongodb service. First, find out the the p
 
 4. If you have not already, open port 27017 on your server by typing `sudo ufw allow 27017`
 
-5. Restart the mongo daemon by typing `sudo service mongod restart`. Make sure you can still log in with mongo while ssh’d into the server.
+5. Restart the mongo daemon by typing `sudo systemctl restart mongodb`. Make sure you can still log in with mongo while ssh’d into the server.
 
 Note: you can try to log in as the newly created `plmUser` by typing `mongo -u "plmUser" -p <plmPassword> --authenticationDatabase "plm"` on the server.
 
