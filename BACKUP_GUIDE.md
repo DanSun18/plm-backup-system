@@ -93,26 +93,13 @@ db.createUser(
 
 3. Enable Auth and Open MongoDB access
 
-Edit your MongoDB config file. On Ubuntu, type `sudo vim /etc/mongodb.conf`
-
-Go to the `#security:` section and add the following line. Make sure to un-comment the `security:` line:
-
-```
-auth = true
-```
-
-Then go to the `net` line and change `bindIp` to `0.0.0.0`. It should look something like this:
-
-```
-# network interfaces
-bind_ip = 0.0.0.0
-``` 
+Edit your MongoDB config file for the mongodb service. First, find out the the path of your config file  by viewing the script to start your mongodb service. On our system, we typed `vi /etc/init.d/mongodb` . Inside the file you will see a line `CONF=<path-to-config-file>`. In our case `<path-to-config-file>` is `/etc/mongodb.conf`. Open the file by typing `sudo vi <path-to-config-file>`. Inside the file, uncomment the line `auth = true`, and change the line specifying `bind_ip` to `bind_ip = 0.0.0.0`.
 
 4. If you have not already, open port 27017 on your server by typing `sudo ufw allow 27017`
 
-5. Restart the mongo daemon by typing `sudo service mongod restart`. Make sure you can still log in with mongo while ssh’d into the box.
+5. Restart the mongo daemon by typing `sudo service mongod restart`. Make sure you can still log in with mongo while ssh’d into the server.
 
-Note: you can log in as the newly created `plmUser` by typing `mongo -u "plmUser" -p <plmPassword> --authenticationDatabase "plm"` on the server.
+Note: you can try to log in as the newly created `plmUser` by typing `mongo -u "plmUser" -p <plmPassword> --authenticationDatabase "plm"` on the server.
 
 ### Locally 
 
