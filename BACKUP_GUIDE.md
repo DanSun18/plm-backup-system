@@ -58,13 +58,13 @@ git update-index --skip-worktree server/email.config.js
 
 2. Determine the backup you want to restore to the original system. For example, if you want the backup on 2018-3-24, the `path-to-backup` could be `backup/database-backup/mongodump-daily/2018-3-24/`
 
-3. On the backup system, run the command `mongorestore --host real-producers-test.colab.duke.edu --username "plmUser" --password "<plmUserPassword>" --authenticationDatabase plm <path-to-backup> --drop --objcheck`. The `--drop` opiton will drop the database before attempt to restore, and `objecheck` will check for validity while attempting to restore.
+3. On the backup system, run the command `mongorestore --host <address-of-your-server> --username "plmUser" --password "<plmUserPassword>" --authenticationDatabase plm <path-to-backup> --drop --objcheck`. The `--drop` opiton will drop the database before attempt to restore, and `objecheck` will check for validity while attempting to restore.
 
 4. You will see command line outputs that indicate whether the restore was successful. In case of schema unmatch, you will also be notified on the command line.
 
 ## Check for validity
 
-We recommend checking the validity of the backup before restoring it to your system. This means first try to restore it to the test server. If it can do so successfully, then restore it to the production server.
+We recommend checking the validity of the backup before restoring it to your system. This means first try to restore it to the test server. After restoring data on the test server, validate your data by running `db.plm.validate({full:true})` in your mongo shell. If you see `valid: true` in the output, the data is valid to use, and you can follow the same steps to restore your data to your production server.
 
 ## Protect Your Database with Password
 
