@@ -42,15 +42,15 @@ git update-index --skip-worktree server/email.config.js
 ```
 
 
-2. Change necessary configurations. Provide your actual password for the email account and database user in `server/dbOptions.config.js` and `server/email.config.js`. In addition, if you wish to use a different email, make changes to `server/email.config.js` as well as the `sendEmail` function in `server/backup.server.controller.js`.
+4. Change necessary configurations. Provide your actual password for the email account and database user in `server/dbOptions.config.js` and `server/email.config.js`. In addition, if you wish to use a different email, make changes to `server/email.config.js` as well as the `sendEmail` function in `server/backup.server.controller.js`.
 
-3. Run `npm install` to install all dependencies. 
+5. Run `npm install` to install all dependencies. 
 
-4. Use `npm run start-dev` to verify that nothing goes wrong.
+6. Use `npm run start-dev` to verify that nothing goes wrong.
 
-5. Use `nohup npm run start-dev >/dev/null 2>&1 & ` to run the server even after you log out the ssh session or close the terminal. The backup routine will run at 10pm New York Time everyday.
+7. Use `nohup npm run start-dev >/dev/null 2>&1 & ` to run the server even after you log out the ssh session or close the terminal. The backup routine will run at 10pm New York Time everyday.
 
-6. Alternatively, you could use the scripts `startNonStoppingServer.sh` and `shutdownServer.sh` provided in the repository to start or shutdown the server, respectively.
+8. Alternatively, you could use the scripts `startNonStoppingServer.sh` and `shutdownServer.sh` provided in the repository to start or shutdown the server, respectively.
 
 ## Restoring from a backup
 
