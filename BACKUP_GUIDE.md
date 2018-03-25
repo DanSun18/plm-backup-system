@@ -54,7 +54,7 @@ git update-index --skip-worktree server/email.config.js
 
 ## Restoring from a backup
 
-1. Log on to the back up system, and navigate to the directory of the backup system (e.g. `cd plm-plm-backup-system`)
+1. Log on to the back up system, and navigate to the directory of the backup system (e.g. `cd plm-backup-system`)
 
 2. Determine the backup you want to restore to the original system. For example, if you want the backup on 2018-3-24, the `path-to-backup` could be `backup/database-backup/mongodump-daily/2018-3-24/`
 
