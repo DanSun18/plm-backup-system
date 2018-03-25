@@ -1,5 +1,71 @@
 # Backup System Guide
 
+Please make sure that your database is protected with authentication and password. If it is not, scroll down to the section __Protect Your Database with Password__ to set up it first.
+
+## Configuring and Setting Up the Backup System
+
+### Setting up your server for the backup system
+
+Our system is Ubuntu 16.04 LTS and you will need git, npm and Node.JS on the back up system. Please look at our deployment guide on how to set up your server and install the necessary tools. 
+
+In addition, install `mongodump` by running the following commands:
+
+```
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 0C49F3730359A14518585931BC711F9BA15703C6
+echo "deb [ arch=amd64,arm64 ] http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.4.list
+
+sudo apt-get update
+sudo apt-get install mongodb-org-tools
+```
+
+### Deploying the backup system from GitHub
+
+1. Clone the repository from GitHub by running
+  
+```
+  git clone https://github.com/DanSun18/plm-backup-system.git
+  cd plm-backup-system
+```
+
+2. Checkout the server version by running 
+
+```
+  git fetch
+  git checkout server
+```
+
+3. Make sure that your password won't get accidentally uploaded to GitHub by running (adopted from https://stackoverflow.com/questions/4348590/how-can-i-make-git-ignore-future-revisions-to-a-file)
+
+```
+git update-index --skip-worktree server/dbOptions.config.js
+git update-index --skip-worktree server/email.config.js
+```
+
+
+2. Change necessary configurations. Provide your actual password for the email account and database user in `server/dbOptions.config.js` and `server/email.config.js`. In addition, if you wish to use a different email, make changes to `server/email.config.js` as well as the `sendEmail` function in `server/backup.server.controller.js`.
+
+3. Run `npm install` to install all dependencies. 
+
+4. Use `npm run start-dev` to verify that nothing goes wrong.
+
+5. Use `nohup npm run start-dev >/dev/null 2>&1 & ` to run the server even after you log out the ssh session or close the terminal. The backup routine will run at 10pm New York Time everyday.
+
+6. Alternatively, you could use the scripts `startNonStoppingServer.sh` and `shutdownServer.sh` provided in the repository to start or shutdown the server, respectively.
+
+## Restoring from a backup
+
+1. Log on to the back up system, and navigate to the directory of the backup system (e.g. `cd plm-plm-backup-system`)
+
+2. Determine the backup you want to restore to the original system. For example, if you want the backup on 2018-3-24, the `path-to-backup` could be `backup/database-backup/mongodump-daily/2018-3-24/`
+
+3. On the backup system, run the command `mongorestore --host real-producers-test.colab.duke.edu --username "plmUser" --password "<plmUserPassword>" --authenticationDatabase plm <path-to-backup> --drop --objcheck`. The `--drop` opiton will drop the database before attempt to restore, and `objecheck` will check for validity while attempting to restore.
+
+4. You will see command line outputs that indicate whether the restore was successful. In case of schema unmatch, you also be notified on the command line.
+
+## Check for validity
+
+We recommend checking the validity of the backup before restoring it to your system. This means first try to restore it to the test server. If it can do so successfully, then restoer it to the production server.
+
 ## Protect Your Database with Password
 
 We outline the steps to make the database password protected here. If your database is already password protected, you may skip this section. 
@@ -128,35 +194,4 @@ sudo ./bin/mongo -u "plmUser" -p <plmPassword> --authenticationDatabase "plm"
 ```
 
 Perform some database operations to verify that you can do it.
-
-## Configuring and Setting Up the Backup System
-
-### Setting up your server for the backup system
-
-Our system is Ubuntu 16.04 LTS and you will need git, npm and Node.JS on the back up system. Please look at our deployment guide on how to set up your server and install the necessary tools. 
-
-In addition, install `mongodump` by running `sudo apt install mongodb-clients`
-
-### Deploying the backup system from GitHub
-
-1. Clone the repository from GitHub by running
-  
-```
-  git clone https://github.com/DanSun18/plm-backup-system.git
-  cd plm-backup-system
-```
-
-2. Change necessary configurations. Provide your actual password for the email account and database user in `server/dbOptions.config.js` and `server/email.config.js`. In addition, if you wish to use a different email, make changes to `server/email.config.js` as well as the `sendEmail` function in `server/backup.server.controller.js`.
-
-3. Run `npm install` to install all dependencies. 
-
-4. Use `npm run start-dev` to verify that nothing goes wrong.
-
-5. Use `nohup npm run start-dev >/dev/null 2>&1 & ` to run the server even after you log out the ssh session or close the terminal. The backup routine will run at 10pm New York Time everyday.
-
-6. Alternatively, you could use the scripts `startNonStoppingServer.sh` and `shutdownServer.sh` provided in the repository to start or shutdown the server, respectively.
-
-## Restoring from a backup
-
-## Verify Backup Validity
 
