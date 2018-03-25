@@ -60,7 +60,7 @@ git update-index --skip-worktree server/email.config.js
 
 3. On the backup system, run the command `mongorestore --host real-producers-test.colab.duke.edu --username "plmUser" --password "<plmUserPassword>" --authenticationDatabase plm <path-to-backup> --drop --objcheck`. The `--drop` opiton will drop the database before attempt to restore, and `objecheck` will check for validity while attempting to restore.
 
-4. You will see command line outputs that indicate whether the restore was successful. In case of schema unmatch, you also be notified on the command line.
+4. You will see command line outputs that indicate whether the restore was successful. In case of schema unmatch, you will also be notified on the command line.
 
 ## Check for validity
 
