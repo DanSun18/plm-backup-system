@@ -89,7 +89,7 @@ db.createUser(
 )
 ```
 
-`<plmPassword>` is a the password for your user, and it is astring such as `"abc123"`.
+`<plmPassword>` is a the password for your user, and it is a string such as `"abc123"`.
 
 3. Enable Auth and Open MongoDB access
 
