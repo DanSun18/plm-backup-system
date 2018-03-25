@@ -64,7 +64,7 @@ git update-index --skip-worktree server/email.config.js
 
 ## Check for validity
 
-We recommend checking the validity of the backup before restoring it to your system. This means first try to restore it to the test server. If it can do so successfully, then restoer it to the production server.
+We recommend checking the validity of the backup before restoring it to your system. This means first try to restore it to the test server. If it can do so successfully, then restore it to the production server.
 
 ## Protect Your Database with Password
 
